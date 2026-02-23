@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  agent:
+    build: ./apps/agent
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/agent:/app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    restart: unless-stopped
+
+  # Optional: Local Supabase if needed (omitted for MVP simplicity, assume cloud or use 'npx supabase start')
