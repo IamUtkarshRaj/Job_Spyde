@@ -8,9 +8,9 @@ export default function Home() {
 
       <div className="flex gap-4">
         <Link href="/login" className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700">
-          Sign IN
+          Sign In
         </Link>
-        <Link href="/login?mode=signup" className="px-6 py-3 border border-gray-300 rounded-md font-medium hover:bg-gray-50 text-black">
+        <Link href="/signup" className="px-6 py-3 border border-gray-300 rounded-md font-medium hover:bg-gray-50 text-black">
           Sign Up
         </Link>
       </div>
