@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Student Job Application Tracker",
-  description: "Track your job applications and tailor resumes with AI.",
+  title: "Job Spyde — Your Intelligent Career Command Center",
+  description: "AI-powered job discovery, resume tailoring, and application tracking for students and early professionals.",
 };
 
 export default function RootLayout({
@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-gray-900 bg-gray-50 flex flex-col min-h-screen`}>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} font-sans antialiased bg-[#0a0e1a] text-slate-100 flex flex-col min-h-screen`}>
         {children}
       </body>
     </html>

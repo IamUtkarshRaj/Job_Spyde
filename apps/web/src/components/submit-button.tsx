@@ -15,7 +15,7 @@ export function SubmitButton({
         <button
             type="submit"
             disabled={pending}
-            className={`${className} ${pending ? 'opacity-70 cursor-wait' : ''}`}
+            className={`${className} ${pending ? 'opacity-70 cursor-wait' : ''} transition-all duration-200`}
         >
             {pending ? 'Processing...' : children}
         </button>

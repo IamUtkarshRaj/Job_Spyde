@@ -1,29 +1,209 @@
 @import "tailwindcss";
 
+/* ============================================
+   AURORA GLASS DESIGN SYSTEM — Job Spyde
+   Dark theme only
+   ============================================ */
+
 :root {
-  --background: #f9fafb; /* gray-50 */
-  --foreground: #111827; /* gray-900 */
+  /* ── Backgrounds ── */
+  --background: #0a0e1a;
+  --surface: #111827;
+  --card: rgba(17, 25, 40, 0.75);
+  --card-solid: #0f172a;
+
+  /* ── Primary Gradient ── */
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+
+  /* ── Text ── */
+  --foreground: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* ── Glass ── */
+  --glass-border: rgba(99, 102, 241, 0.15);
+  --glass-border-hover: rgba(99, 102, 241, 0.3);
+  --glass-glow: rgba(99, 102, 241, 0.08);
+
+  /* ── Status Colors ── */
+  --status-discovered-bg: rgba(100, 116, 139, 0.2);
+  --status-discovered-text: #94a3b8;
+  --status-saved-bg: rgba(59, 130, 246, 0.2);
+  --status-saved-text: #60a5fa;
+  --status-prepared-bg: rgba(245, 158, 11, 0.2);
+  --status-prepared-text: #fbbf24;
+  --status-applied-bg: rgba(34, 197, 94, 0.2);
+  --status-applied-text: #4ade80;
+  --status-interview-bg: rgba(168, 85, 247, 0.2);
+  --status-interview-text: #c084fc;
+  --status-offer-bg: rgba(236, 72, 153, 0.2);
+  --status-offer-text: #f472b6;
+  --status-rejected-bg: rgba(239, 68, 68, 0.2);
+  --status-rejected-text: #f87171;
+  --status-ghosted-bg: rgba(100, 116, 139, 0.3);
+  --status-ghosted-text: #94a3b8;
+
+  /* ── Semantic ── */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* ── Borders ── */
+  --border: rgba(51, 65, 85, 0.5);
+  --border-hover: rgba(99, 102, 241, 0.3);
+
+  /* ── Sidebar ── */
+  --sidebar-bg: rgba(15, 23, 42, 0.92);
+  --sidebar-border: rgba(51, 65, 85, 0.5);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-solid: var(--card-solid);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-hover: var(--glass-border-hover);
+  --color-glass-glow: var(--glass-glow);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
   --font-sans: var(--font-inter);
 }
-
-/* Remove dark scheme for MVP simplicity */
-/* 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-*/
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   @apply antialiased;
+}
+
+/* ── Aurora Animated Background ── */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  33% { transform: translate(30px, -20px) scale(1.1); opacity: 0.6; }
+  66% { transform: translate(-20px, 15px) scale(0.95); opacity: 0.35; }
+}
+
+@keyframes aurora-drift-alt {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  50% { transform: translate(-40px, 25px) scale(1.15); opacity: 0.5; }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: aurora-drift 12s ease-in-out infinite;
+}
+
+.aurora-blob-alt {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  animation: aurora-drift-alt 15s ease-in-out infinite;
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out both;
+}
+
+/* ── Glass Card Utilities ── */
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px var(--glass-glow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+}
+
+.glass-card-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Gradient Utilities ── */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+}
+
+.gradient-bg-hover:hover {
+  background: linear-gradient(135deg, #818cf8, #60a5fa);
+}
+
+.gradient-border {
+  border-image: linear-gradient(135deg, #6366f1, #3b82f6, #06b6d4) 1;
+}
+
+/* ── Glow Effects ── */
+.glow-indigo {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.glow-indigo-strong {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.4);
+}
+
+/* ── Focus Styles ── */
+*:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
 }

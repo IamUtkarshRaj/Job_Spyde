@@ -1,4 +1,5 @@
 import { Calendar, MapPin, Building2, ExternalLink } from 'lucide-react'
+import { Badge } from '@/components/ui/Badge'
 
 // Define the Job interface based on schema
 export interface Job {
@@ -16,55 +17,47 @@ export interface Job {
 }
 
 export function JobCard({ job }: { job: Job }) {
-    const statusColors = {
-        discovered: 'bg-gray-100 text-gray-800',
-        saved: 'bg-blue-100 text-blue-800',
-        prepared: 'bg-yellow-100 text-yellow-800',
-        applied: 'bg-green-100 text-green-800',
-        interview: 'bg-purple-100 text-purple-800',
-        offer: 'bg-pink-100 text-pink-800',
-        rejected: 'bg-red-100 text-red-800',
-        ghosted: 'bg-gray-400 text-white',
-    }
-
     return (
-        <div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition bg-card text-card-foreground">
-            <div className="flex justify-between items-start mb-2">
-                <div>
-                    <h3 className="font-semibold text-lg">{job.title}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground gap-1">
-                        <Building2 size={14} />
-                        <span>{job.company}</span>
+        <div className="glass-card glass-card-lift p-5">
+            <div className="flex justify-between items-start mb-3">
+                <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-lg text-slate-100 truncate">{job.title}</h3>
+                    <div className="flex items-center text-sm text-slate-500 gap-1.5 mt-0.5">
+                        <Building2 size={14} className="shrink-0" />
+                        <span className="truncate">{job.company}</span>
                     </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[job.status] || 'bg-gray-100'}`}>
+                <Badge variant={job.status} className="ml-2 shrink-0">
                     {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                </span>
+                </Badge>
             </div>
 
-            <div className="flex flex-col gap-1 mt-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                    <MapPin size={14} />
+            <div className="flex flex-col gap-1.5 mt-3 text-sm text-slate-500">
+                <div className="flex items-center gap-1.5">
+                    <MapPin size={14} className="shrink-0" />
                     <span>{job.location || 'Remote'}</span>
                 </div>
                 {job.posted_at && (
-                    <div className="flex items-center gap-1">
-                        <Calendar size={14} />
+                    <div className="flex items-center gap-1.5">
+                        <Calendar size={14} className="shrink-0" />
                         <span>{new Date(job.posted_at).toLocaleDateString()}</span>
                     </div>
                 )}
             </div>
 
-            <div className="mt-4 flex justify-between items-center">
+            <div className="mt-4 pt-3 border-t border-slate-800/30 flex justify-between items-center">
                 <div className="flex items-center gap-1">
                     {job.match_score !== null && (
-                        <div className="text-sm font-medium">
-                            Match: <span className={job.match_score > 80 ? 'text-green-600' : 'text-yellow-600'}>{job.match_score}%</span>
-                        </div>
+                        <Badge variant="match" score={job.match_score}>
+                            {job.match_score}% Match
+                        </Badge>
                     )}
                 </div>
 
-                <a href={`/jobs/${job.id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                <a
+                    href={`/jobs/${job.id}`}
+                    className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
                     View Details
                 </a>
             </div>
