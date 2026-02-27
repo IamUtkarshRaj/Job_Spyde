@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-const AGENT_URL = process.env.AGENT_URL || 'http://localhost:8000'
+const AGENT_URL = process.env.AGENT_URL || 'http://127.0.0.1:8000'
 
 export async function discoverJobs() {
   const supabase = await createClient()
@@ -14,20 +14,19 @@ export async function discoverJobs() {
   // Fetch preferences
   const { data: profile } = await supabase.from('profiles').select('preferences').eq('id', user.id).single()
 
-  const defaults = {
-    roles: [],
-    locations: [],
-    remote_preference: false,
-    keywords: []
+  const prefs = profile?.preferences || {};
+  const payload = {
+    user_id: user.id,
+    roles: prefs.roles || [],
+    locations: prefs.locations || [],
+    remote: prefs.remote_preference || false,
+    keywords: prefs.keywords || []
   }
 
-  const payload = {
-    ...defaults,
-    ...(profile?.preferences || {})
-  }
+  console.log("Discovering jobs with payload:", payload);
 
   try {
-    const res = await fetch(`${AGENT_URL}/v1/discover_jobs`, {
+    const res = await fetch(`${AGENT_URL}/v1/jobs/collect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -35,13 +34,15 @@ export async function discoverJobs() {
     })
 
     if (!res.ok) {
-       console.error('Agent discover error:', await res.text())
-       return []
+      console.error('Agent discover error:', res.status, await res.text())
+      return []
     }
 
-    return await res.json()
+    const data = await res.json()
+    console.log(`Discovered ${data.length} jobs.`);
+    return data;
   } catch (err) {
-    console.error('Failed to discover jobs:', err)
+    console.error('Failed to discover jobs execution:', err)
     return []
   }
 }

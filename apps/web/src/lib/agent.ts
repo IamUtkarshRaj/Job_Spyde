@@ -1,4 +1,4 @@
-const AGENT_URL = process.env.AGENT_URL || 'http://localhost:8000'
+const AGENT_URL = process.env.AGENT_URL || 'http://127.0.0.1:8000'
 
 export async function generateResumeDraft(data: {
   user_profile: any
@@ -7,7 +7,7 @@ export async function generateResumeDraft(data: {
   job_title: string
   company: string
 }) {
-  const res = await fetch(`${AGENT_URL}/v1/generate_resume`, {
+  const res = await fetch(`${AGENT_URL}/v1/resume/optimize`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

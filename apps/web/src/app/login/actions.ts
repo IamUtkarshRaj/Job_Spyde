@@ -25,7 +25,7 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
-  
+
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const firstName = formData.get('first_name') as string
@@ -47,9 +47,9 @@ export async function signup(formData: FormData) {
 
   if (error) {
     if (error.message.includes('rate limit')) {
-        console.warn('Signup rate limit hit:', error.message)
-        const encodedError = encodeURIComponent('Too many signup attempts. Please try again in 15 minutes.')
-        return redirect(`/signup?error=${encodedError}`)
+      console.warn('Signup rate limit hit:', error.message)
+      const encodedError = encodeURIComponent('Too many signup attempts. Please try again in 15 minutes.')
+      return redirect(`/signup?error=${encodedError}`)
     }
 
     console.error('Signup error:', error)
@@ -57,4 +57,11 @@ export async function signup(formData: FormData) {
   }
 
   return redirect('/signup?message=Check email to continue sign in process')
+}
+
+export async function signOut() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }
