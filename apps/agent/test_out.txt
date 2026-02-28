@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "C:\Users\Shivam\OneDrive\Desktop\Job Spyde\apps\agent\test_collectors.py", line 2, in <module>
+    from app.collectors.linkedin import DuckDuckGoCollector
+  File "C:\Users\Shivam\OneDrive\Desktop\Job Spyde\apps\agent\app\collectors\linkedin.py", line 1, in <module>
+    from duckduckgo_search import AsyncDDGS
+ImportError: cannot import name 'AsyncDDGS' from 'duckduckgo_search' (C:\Users\Shivam\AppData\Local\Programs\Python\Python310\lib\site-packages\duckduckgo_search\__init__.py)

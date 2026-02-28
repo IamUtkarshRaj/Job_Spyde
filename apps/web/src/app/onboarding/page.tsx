@@ -56,12 +56,36 @@ export default function OnboardingPage() {
                     </div>
 
                     <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="experience_level">Experience Level</label>
+                        <select
+                            name="experience_level"
+                            className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 text-sm transition-all"
+                            required
+                        >
+                            <option value="Entry Level">Entry Level (0-2 years)</option>
+                            <option value="Mid Level">Mid Level (2-5 years)</option>
+                            <option value="Senior Level">Senior Level (5+ years)</option>
+                            <option value="Lead/Management">Lead/Management</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="keywords">Keywords to Include (comma separated)</label>
                         <input
                             className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 text-sm transition-all"
                             name="keywords"
                             placeholder="React, Python, AWS"
                             defaultValue="React, Python"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="resume_text">Your Resume (Paste text here)</label>
+                        <textarea
+                            name="resume_text"
+                            className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 text-sm transition-all min-h-[150px]"
+                            placeholder="Paste your resume text here for AI matching..."
+                            required
                         />
                     </div>
 

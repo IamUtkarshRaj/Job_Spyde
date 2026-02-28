@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "AI-powered job discovery, resume tailoring, and application tracking for students and early professionals.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

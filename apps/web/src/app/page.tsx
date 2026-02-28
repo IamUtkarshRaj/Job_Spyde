@@ -56,6 +56,7 @@ const mockJobs = [
 
 export default function LandingPage() {
   return (
+
     <div className="relative overflow-hidden">
       {/* Aurora Background Blobs */}
       <div className="aurora-blob w-[500px] h-[500px] bg-indigo-600/20 top-[-100px] left-[-100px]" />
@@ -187,16 +188,16 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${job.match > 85
-                      ? 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30'
-                      : 'text-amber-300 bg-amber-500/20 border-amber-500/30'
+                    ? 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30'
+                    : 'text-amber-300 bg-amber-500/20 border-amber-500/30'
                     }`}>
                     {job.match}% Match
                   </span>
                   <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${job.status === 'Interview'
-                      ? 'text-purple-300 bg-purple-500/20 border-purple-500/20'
-                      : job.status === 'Applied'
-                        ? 'text-green-300 bg-green-500/20 border-green-500/20'
-                        : 'text-blue-300 bg-blue-500/20 border-blue-500/20'
+                    ? 'text-purple-300 bg-purple-500/20 border-purple-500/20'
+                    : job.status === 'Applied'
+                      ? 'text-green-300 bg-green-500/20 border-green-500/20'
+                      : 'text-blue-300 bg-blue-500/20 border-blue-500/20'
                     }`}>
                     {job.status}
                   </span>
@@ -251,5 +252,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+
   )
 }

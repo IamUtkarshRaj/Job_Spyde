@@ -1,11 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { CheckCircle, BarChart3, TrendingUp, Sparkles, Inbox } from 'lucide-react'
 
-const AGENT_URL = process.env.AGENT_URL || 'http://localhost:8000'
+const AGENT_URL = process.env.AGENT_URL || 'http://127.0.0.1:8000'
 
 async function getDigestSuggestion(stats: any) {
     try {
-        const res = await fetch(`${AGENT_URL}/v1/generate_digest`, {
+        const res = await fetch(`${AGENT_URL}/v1/agents/generate_digest`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

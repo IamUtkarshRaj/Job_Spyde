@@ -1,6 +1,6 @@
 'use client'
 
-import { saveJob } from '@/app/discover/actions'
+import { saveJob } from '@/app/(app)/discover/actions'
 import { useState } from 'react'
 import { Check, Bookmark } from 'lucide-react'
 

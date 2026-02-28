@@ -9,7 +9,7 @@ import { useState } from 'react'
 const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/discover', label: 'Jobs', icon: Search },
-    { href: '/resume', label: 'Resume', icon: FileText },
+    { href: '/profile', label: 'Profile', icon: Settings },
     { href: '/digest', label: 'Digest', icon: Sparkles },
 ]
 
