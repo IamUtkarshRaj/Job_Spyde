@@ -7,8 +7,8 @@ langchain-google-genai
 pydantic
 pydantic-settings
 httpx
-duckduckgo-search
-ddgs
+python-jobspy
+pandas
 beautifulsoup4
 supabase
 redis[hiredis]

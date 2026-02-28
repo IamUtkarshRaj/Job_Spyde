@@ -1,19 +1,21 @@
 import asyncio
-from app.collectors.linkedin import DuckDuckGoCollector
 from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.lever import LeverCollector
 from app.collectors.ashby import AshbyCollector
+from app.collectors.jobspy_collector import JobSpyCollector
 from app.models.job import JobFilter
 
 async def main():
     query = JobFilter(roles=["software engineer"], locations=["remote"])
     
-    print("Testing DuckDuckGoCollector")
+    print("Testing JobSpyCollector")
     try:
-        res = await DuckDuckGoCollector().collect(query)
-        print("DDG Results:", len(res))
+        res = await JobSpyCollector().collect(query)
+        print("JobSpy Results:", len(res))
+        if res:
+            print("First Job:", res[0].model_dump())
     except Exception as e:
-        print("DDG Error:", e)
+        print("JobSpy Error:", e)
 
     companies = ["vimeo", "figma", "notion", "stripe", "plaid"]
     

@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { createClient } from '@/utils/supabase/server'
-import { Navigation } from '@/components/Navigation'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Student Job Application Tracker",
-  description: "Track your job applications and tailor resumes with AI.",
+  title: "Job Spyde — Your Intelligent Career Command Center",
+  description: "AI-powered job discovery, resume tailoring, and application tracking for students and early professionals.",
 };
 
 export default async function RootLayout({
@@ -16,16 +14,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-gray-900 bg-gray-50 flex min-h-screen`}>
-        {user && <Navigation />}
-        <main className="flex-1 overflow-y-auto w-full p-4 md:p-8">
-          {children}
-        </main>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} font-sans antialiased bg-[#0a0e1a] text-slate-100 flex flex-col min-h-screen`}>
+        {children}
       </body>
     </html>
   );

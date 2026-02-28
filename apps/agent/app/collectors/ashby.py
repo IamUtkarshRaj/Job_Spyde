@@ -1,5 +1,6 @@
+from __future__ import annotations
 import httpx
-from typing import List
+from typing import List, AsyncGenerator
 from app.models.job import CollectedJob, JobFilter
 from app.collectors.base import BaseCollector
 
@@ -8,11 +9,9 @@ class AshbyCollector(BaseCollector):
         self.companies = companies
 
     async def collect(self, query: JobFilter) -> List[CollectedJob]:
-        jobs = []
+        all_jobs = []
         async with httpx.AsyncClient(timeout=10) as client:
             for company in self.companies:
-                # Ashby uses a GraphQL endpoint usually, or a REST endpoint like jobs.ashbyhq.com/api/non-user-graphql
-                # We'll use a simplified REST proxy approach for the boilerplate
                 url = f"https://api.ashbyhq.com/jobBoard/{company}"
                 try:
                     response = await client.get(url)
@@ -23,7 +22,7 @@ class AshbyCollector(BaseCollector):
                             location = item.get("location", "")
                             
                             if any(role.lower() in title.lower() for role in query.roles):
-                                jobs.append(CollectedJob(
+                                all_jobs.append(CollectedJob(
                                     title=title,
                                     company=company.capitalize(),
                                     location=location,
@@ -33,5 +32,5 @@ class AshbyCollector(BaseCollector):
                                     posted_at=item.get("publishedAt", "Recently")
                                 ))
                 except Exception as e:
-                    print(f"Error fetching Ashby jobs for {company}: {e}")
-        return jobs
+                    print(f"Error fetching Ashby jobs for {company}: {type(e).__name__}: {str(e)}")
+        return all_jobs

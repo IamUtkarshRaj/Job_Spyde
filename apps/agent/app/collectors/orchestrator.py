@@ -1,10 +1,11 @@
+from __future__ import annotations
 import asyncio
-from typing import List
+from typing import List, AsyncGenerator
 from app.models.job import CollectedJob, JobFilter
 from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.lever import LeverCollector
 from app.collectors.ashby import AshbyCollector
-from app.collectors.linkedin import DuckDuckGoCollector
+from app.collectors.jobspy_collector import JobSpyCollector
 
 class CollectorOrchestrator:
     def __init__(self):
@@ -12,29 +13,30 @@ class CollectorOrchestrator:
         target_companies = ["vimeo", "figma", "notion", "stripe", "plaid"]
         
         self.collectors = [
-            DuckDuckGoCollector(),
+            JobSpyCollector(),
             GreenhouseCollector(companies=target_companies),
             LeverCollector(companies=target_companies),
             AshbyCollector(companies=target_companies)
         ]
         
     async def run_all(self, query: JobFilter) -> List[CollectedJob]:
-        results = await asyncio.gather(
-            *[collector.collect(query) for collector in self.collectors],
-            return_exceptions=True
-        )
+        """
+        Runs all collectors in parallel and returns aggregated results.
+        Wait for all to finish (Batch).
+        """
+        tasks = [c.collect(query) for c in self.collectors]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
         all_jobs = []
-        for result_list in results:
-            if isinstance(result_list, Exception):
-                print(f"Collector failed: {result_list}")
-                continue
-            all_jobs.extend(result_list)
-            
-        # Deduplicate by URL
-        unique_jobs = {}
-        for job in all_jobs:
-            if job.url not in unique_jobs:
-                unique_jobs[job.url] = job
+        seen_urls = set()
+        
+        for res in results:
+            if isinstance(res, list):
+                for job in res:
+                    if job.url not in seen_urls:
+                        seen_urls.add(job.url)
+                        all_jobs.append(job)
+            else:
+                print(f"Collector error: {res}")
                 
-        return list(unique_jobs.values())
+        return all_jobs

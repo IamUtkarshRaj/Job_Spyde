@@ -1,5 +1,6 @@
+from __future__ import annotations
 import httpx
-from typing import List
+from typing import List, AsyncGenerator
 from app.models.job import CollectedJob, JobFilter
 from app.collectors.base import BaseCollector
 
@@ -8,7 +9,7 @@ class LeverCollector(BaseCollector):
         self.companies = companies
 
     async def collect(self, query: JobFilter) -> List[CollectedJob]:
-        jobs = []
+        all_jobs = []
         async with httpx.AsyncClient(timeout=10) as client:
             for company in self.companies:
                 url = f"https://api.lever.co/v0/postings/{company}"
@@ -19,10 +20,9 @@ class LeverCollector(BaseCollector):
                         for item in data:
                             title = item.get("text", "")
                             location = item.get("categories", {}).get("location", "Unknown")
-                            commitment = item.get("categories", {}).get("commitment", "")
                             
                             if any(role.lower() in title.lower() for role in query.roles):
-                                jobs.append(CollectedJob(
+                                all_jobs.append(CollectedJob(
                                     title=title,
                                     company=company.capitalize(),
                                     location=location,
@@ -32,5 +32,5 @@ class LeverCollector(BaseCollector):
                                     posted_at=str(item.get("createdAt", "Recently"))
                                 ))
                 except Exception as e:
-                    print(f"Error fetching Lever jobs for {company}: {e}")
-        return jobs
+                    print(f"Error fetching Lever jobs for {company}: {type(e).__name__}: {str(e)}")
+        return all_jobs
