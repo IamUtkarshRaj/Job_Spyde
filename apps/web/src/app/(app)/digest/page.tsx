@@ -65,53 +65,55 @@ export default async function DigestPage() {
     const agentResponse = await getDigestSuggestion(stats)
 
     const statCards = [
-        { label: 'New Jobs (24h)', value: stats.new_jobs_count, icon: Sparkles, color: 'text-amber-300', caption: 'Fresh opportunities found' },
-        { label: 'Active Pipeline', value: stats.saved_jobs_count, icon: Inbox, color: 'text-blue-300', caption: 'Jobs in progress' },
-        { label: 'Applied (This Week)', value: stats.applied_count, icon: TrendingUp, color: 'text-green-300', caption: 'Keep up the momentum!' },
+        { label: 'New Jobs (24h)', value: stats.new_jobs_count, icon: Sparkles, color: 'text-[var(--color-accent-primary)]' },
+        { label: 'Active Pipeline', value: stats.saved_jobs_count, icon: Inbox, color: 'text-[var(--color-soft-violet)]' },
+        { label: 'Applied (This Week)', value: stats.applied_count, icon: TrendingUp, color: 'text-[var(--color-neon-teal)]' },
     ]
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-100">Daily Digest</h1>
-                <p className="text-slate-500 mt-1">Your daily job search insights and AI-powered recommendations.</p>
+        <div className="space-y-8 max-w-5xl mx-auto relative z-10 w-full">
+            <div className="flex flex-col gap-2">
+                <h1 className="text-4xl font-bold tracking-tighter aurora-text py-1">Daily Digest</h1>
+                <p className="text-slate-400 font-light">Your daily job search insights and AI-powered recommendations.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {statCards.map((stat) => {
                     const Icon = stat.icon
                     return (
-                        <div key={stat.label} className="glass-card p-6 flex flex-col justify-between">
+                        <div key={stat.label} className="glass-panel ghost-border p-6 rounded-2xl flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
                             <div>
-                                <div className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                                    <Icon size={16} className={stat.color} />
+                                <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-4">
+                                    <Icon size={14} className={stat.color} />
                                     {stat.label}
                                 </div>
                                 <p className={`text-4xl font-bold ${stat.color}`}>{stat.value}</p>
                             </div>
-                            <div className="mt-4 text-xs text-slate-600">{stat.caption}</div>
                         </div>
                     )
                 })}
             </div>
 
-            <div className="glass-card p-8 glow-indigo bg-gradient-to-br from-indigo-500/5 to-blue-500/5">
-                <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-                        <BarChart3 className="h-5 w-5 text-white" />
+            <div className="glass-panel ghost-border rounded-3xl p-8 relative overflow-hidden">
+                <div className="absolute -top-32 -left-32 w-96 h-96 bg-[var(--color-neon-teal)]/10 blur-3xl rounded-full pointer-events-none" />
+                <div className="flex items-start gap-4 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[var(--color-neon-teal)]/20 to-[var(--color-accent-primary)]/20 border border-[var(--color-neon-teal)]/30 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(105,246,184,0.1)]">
+                        <BarChart3 className="h-6 w-6 text-[var(--color-neon-teal)]" />
                     </div>
                     <div className="flex-1">
-                        <h2 className="text-xl font-semibold text-slate-200 mb-4">Suggested Actions</h2>
-                        <ul className="space-y-3">
+                        <h2 className="text-sm font-bold text-white mb-6 uppercase tracking-widest flex items-center gap-2">
+                            Suggested Actions
+                        </h2>
+                        <ul className="space-y-4">
                             {agentResponse.suggested_actions && agentResponse.suggested_actions.length > 0 ? (
                                 agentResponse.suggested_actions.map((action: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-3 text-slate-300 bg-slate-800/30 p-3 rounded-xl border border-slate-700/20">
-                                        <CheckCircle className="mt-0.5 h-5 w-5 text-indigo-400 shrink-0" />
-                                        <span className="font-medium text-sm">{action}</span>
+                                    <li key={i} className="flex items-start gap-4 text-white bg-white/[0.02] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                        <CheckCircle className="mt-0.5 h-5 w-5 text-[var(--color-neon-teal)] shrink-0" />
+                                        <span className="font-light text-sm leading-relaxed">{action}</span>
                                     </li>
                                 ))
                             ) : (
-                                <li className="text-slate-500 italic text-sm">No specific actions for today. Keep checking for new jobs!</li>
+                                <li className="text-slate-500 italic text-sm font-light">No specific actions for today. Keep checking for new jobs!</li>
                             )}
                         </ul>
                     </div>

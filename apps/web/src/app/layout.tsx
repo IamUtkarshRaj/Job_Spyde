@@ -16,7 +16,8 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased bg-[#0a0e1a] text-slate-100 flex flex-col min-h-screen`}>
+      <body className={`${inter.variable} font-sans antialiased bg-[var(--bg-deep)] text-[var(--text-primary)] flex flex-col min-h-screen relative overflow-x-hidden`}>
+        <div className="grain-overlay" />
         {children}
       </body>
     </html>

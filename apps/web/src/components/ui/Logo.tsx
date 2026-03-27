@@ -30,15 +30,15 @@ export function Logo({ size = 'default' }: { size?: 'small' | 'default' | 'large
                 <circle cx="23" cy="22" r="3" fill="url(#logo-gradient)" />
                 <defs>
                     <linearGradient id="logo-gradient" x1="0" y1="0" x2="28" y2="28">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#3b82f6" />
+                        <stop offset="0%" stopColor="#85adff" />
+                        <stop offset="100%" stopColor="#69f6b8" />
                     </linearGradient>
                 </defs>
             </svg>
             {/* Wordmark */}
-            <span className={`${s.text} font-bold tracking-tight`}>
+            <span className={`${s.text} font-black tracking-tight`}>
                 <span className="text-slate-100">Job</span>
-                <span className="gradient-text"> Spyde</span>
+                <span className="gradient-text">Spyde</span>
             </span>
         </Link>
     )

@@ -19,8 +19,8 @@ export function JobSaveButton({ job }: { job: any }) {
 
     if (saved) {
         return (
-            <button disabled className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-500/15 text-green-300 text-sm rounded-lg font-medium border border-green-500/20">
-                <Check size={14} />
+            <button disabled className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-success)]/10 text-[var(--color-success)] text-sm rounded-xl font-bold border border-[var(--color-success)]/30 backdrop-blur-md transition-all shadow-[0_0_15px_rgba(105,246,184,0.15)]">
+                <Check size={16} />
                 Saved
             </button>
         )
@@ -30,9 +30,9 @@ export function JobSaveButton({ job }: { job: any }) {
         <button
             onClick={handleSave}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 gradient-bg text-white hover:brightness-110 text-sm rounded-lg font-medium shadow-md shadow-indigo-500/15 disabled:opacity-50 transition-all duration-200"
+            className="magnetic-btn inline-flex items-center gap-2 px-4 py-2 bg-white/5 text-white hover:bg-white/10 text-sm rounded-xl font-semibold border border-white/10 shadow-[0_0_15px_rgba(133,173,255,0.1)] disabled:opacity-50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(133,173,255,0.2)]"
         >
-            <Bookmark size={14} />
+            <Bookmark size={16} className={loading ? "animate-pulse" : ""} />
             {loading ? 'Saving...' : 'Save Job'}
         </button>
     )

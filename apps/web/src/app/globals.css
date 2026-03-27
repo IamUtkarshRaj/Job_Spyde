@@ -1,209 +1,254 @@
 @import "tailwindcss";
 
 /* ============================================
-   AURORA GLASS DESIGN SYSTEM — Job Spyde
-   Dark theme only
+   JOB SPYDE DESIGN SYSTEM
+   Obsidian Observatory (Stitch Integrated)
    ============================================ */
 
 :root {
-  /* ── Backgrounds ── */
-  --background: #0a0e1a;
-  --surface: #111827;
-  --card: rgba(17, 25, 40, 0.75);
-  --card-solid: #0f172a;
+  /* ── Legacy Aliases to prevent breaking changes ── */
+  --bg-deep: var(--color-bg-primary);
+  --bg-surface: var(--color-bg-secondary);
+  --bg-card: var(--color-glass-surface);
+  --aurora-1: var(--color-accent-primary);
+  --aurora-2: var(--color-soft-violet);
+  --aurora-3: var(--color-neon-teal);
+  --aurora-4: var(--color-aurora-blue);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-tertiary: var(--color-text-muted);
+  --glass-border: var(--color-glass-border);
+  --glass-border-hover: rgba(133, 173, 255, 0.3);
+  --glass-glow: var(--color-accent-glow);
 
-  /* ── Primary Gradient ── */
-  --primary: #6366f1;
-  --primary-hover: #818cf8;
-  --accent-blue: #3b82f6;
-  --accent-cyan: #06b6d4;
-
-  /* ── Text ── */
-  --foreground: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-
-  /* ── Glass ── */
-  --glass-border: rgba(99, 102, 241, 0.15);
-  --glass-border-hover: rgba(99, 102, 241, 0.3);
-  --glass-glow: rgba(99, 102, 241, 0.08);
-
-  /* ── Status Colors ── */
-  --status-discovered-bg: rgba(100, 116, 139, 0.2);
-  --status-discovered-text: #94a3b8;
-  --status-saved-bg: rgba(59, 130, 246, 0.2);
-  --status-saved-text: #60a5fa;
-  --status-prepared-bg: rgba(245, 158, 11, 0.2);
-  --status-prepared-text: #fbbf24;
-  --status-applied-bg: rgba(34, 197, 94, 0.2);
-  --status-applied-text: #4ade80;
-  --status-interview-bg: rgba(168, 85, 247, 0.2);
-  --status-interview-text: #c084fc;
-  --status-offer-bg: rgba(236, 72, 153, 0.2);
-  --status-offer-text: #f472b6;
-  --status-rejected-bg: rgba(239, 68, 68, 0.2);
-  --status-rejected-text: #f87171;
-  --status-ghosted-bg: rgba(100, 116, 139, 0.3);
-  --status-ghosted-text: #94a3b8;
-
-  /* ── Semantic ── */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
-
-  /* ── Borders ── */
-  --border: rgba(51, 65, 85, 0.5);
-  --border-hover: rgba(99, 102, 241, 0.3);
-
-  /* ── Sidebar ── */
-  --sidebar-bg: rgba(15, 23, 42, 0.92);
-  --sidebar-border: rgba(51, 65, 85, 0.5);
+  /* Stitch explicit color aliases */
+  --color-primary: #85adff;
+  --color-primary-dim: #699cff;
+  --color-on-primary: #002c66;
+  --color-secondary: #69f6b8;
+  --color-secondary-dim: #58e7ab;
+  --color-tertiary: #ac8aff;
+  --color-tertiary-dim: #8455ef;
+  --color-surface-dim: #0a0e1a;
+  --color-surface-container: #141928;
+  --color-surface-container-lowest: #000000;
+  --color-outline-variant: #444756;
+  --color-on-secondary-container: #e1ffec;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-card: var(--card);
-  --color-card-solid: var(--card-solid);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-cyan: var(--accent-cyan);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  --color-glass-border: var(--glass-border);
-  --color-glass-border-hover: var(--glass-border-hover);
-  --color-glass-glow: var(--glass-glow);
-  --color-border: var(--border);
-  --color-border-hover: var(--border-hover);
-  --color-sidebar-bg: var(--sidebar-bg);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --font-sans: var(--font-inter);
+  /* ── 1. COLOR TOKEN SYSTEM (Stitch Obsidian Observatory) ── */
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #0e1320;
+  --color-glass-surface: rgba(14, 19, 32, 0.6);
+  --color-glass-border: rgba(68, 71, 86, 0.2);
+  
+  --color-accent-primary: #85adff;
+  --color-accent-hover: #699cff;
+  --color-accent-glow: rgba(133, 173, 255, 0.3);
+  
+  --color-text-primary: #e2e4f6;
+  --color-text-secondary: #a7aabb;
+  --color-text-muted: #717584;
+  
+  --color-success: #69f6b8;
+  --color-warning: #f59e0b;
+  --color-error: #ff716c;
+  
+  /* Stitch Aurora Palette */
+  --color-aurora-blue: #699cff;
+  --color-neon-teal: #69f6b8;
+  --color-soft-violet: #ac8aff;
+
+  /* ── 2. SPACING SYSTEM (4px baseline) ── */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-24: 6rem;
+
+  /* ── TYPOGRAPHY BASE ── */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  /* Shadows */
+  --shadow-glow: 0 0 20px -5px var(--color-accent-glow);
+  --shadow-glow-lg: 0 0 40px -10px var(--color-accent-glow);
+  --shadow-depth: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
 }
+
+/* ============================================
+   BASE STYLES & TOKENS
+   ============================================ */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  @apply antialiased;
+  background-color: var(--color-bg-primary);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(0, 91, 196, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(105, 246, 184, 0.1) 0%, transparent 50%);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Aurora Animated Background ── */
-@keyframes aurora-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  33% { transform: translate(30px, -20px) scale(1.1); opacity: 0.6; }
-  66% { transform: translate(-20px, 15px) scale(0.95); opacity: 0.35; }
-}
-
-@keyframes aurora-drift-alt {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  50% { transform: translate(-40px, 25px) scale(1.15); opacity: 0.5; }
-}
-
-@keyframes float-up {
-  0% { transform: translateY(20px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-.aurora-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  animation: aurora-drift 12s ease-in-out infinite;
-}
-
-.aurora-blob-alt {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  pointer-events: none;
-  animation: aurora-drift-alt 15s ease-in-out infinite;
-}
-
-.animate-float-up {
-  animation: float-up 0.6s ease-out both;
-}
-
-/* ── Glass Card Utilities ── */
-.glass-card {
-  background: var(--card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1rem;
-  box-shadow: 0 4px 24px var(--glass-glow);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.glass-card:hover {
-  border-color: var(--glass-border-hover);
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
-}
-
-.glass-card-lift:hover {
-  transform: translateY(-2px);
-}
-
-/* ── Gradient Utilities ── */
-.gradient-text {
-  background: linear-gradient(135deg, #6366f1, #3b82f6, #06b6d4);
+/* ── 3. TYPOGRAPHY SYSTEM ── */
+.text-hero {
+  font-size: clamp(4.5rem, 8vw, 6rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(to right, #85adff, #69f6b8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-bg {
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
+.text-section {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-.gradient-bg-hover:hover {
-  background: linear-gradient(135deg, #818cf8, #60a5fa);
+.text-card {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
-.gradient-border {
-  border-image: linear-gradient(135deg, #6366f1, #3b82f6, #06b6d4) 1;
+.text-meta {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-/* ── Glow Effects ── */
-.glow-indigo {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+.text-cinematic {
+  background: linear-gradient(to right, #85adff, #69f6b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.glow-indigo-strong {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
+/* ── Stitch Aurora Text ── */
+.aurora-text {
+  background: linear-gradient(to right, #85adff, #69f6b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* ── Scrollbar ── */
+/* ── Stitch Gradient Text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #85adff, #69f6b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Effects & Backgrounds ── */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  mix-blend-mode: overlay;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(133, 173, 255, 0.08), transparent 35%), 
+    radial-gradient(circle at 85% 30%, rgba(105, 246, 184, 0.06), transparent 35%);
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Component Primitives ── */
+
+/* Glass Panel — Stitch Obsidian */
+.glass-panel {
+  background: rgba(14, 19, 32, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(68, 71, 86, 0.2);
+  border-radius: 1rem;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel:hover {
+  border-color: rgba(133, 173, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05),
+    0 0 20px -5px var(--color-accent-glow);
+}
+
+/* Ghost Border — Stitch */
+.ghost-border {
+  outline: 1px solid rgba(68, 71, 86, 0.2);
+}
+
+/* Active Glow — Stitch */
+.active-glow {
+  box-shadow: 0 0 12px rgba(105, 246, 184, 0.5);
+}
+
+/* Interactive Buttons */
+.btn-primary {
+  background: linear-gradient(90deg, #85adff, #699cff);
+  color: white;
+  font-weight: 600;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-lg);
+  filter: brightness(1.1);
+}
+
+.magnetic-btn {
+  will-change: transform;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-bg-primary);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
-  border-radius: 3px;
+  background: rgba(68, 71, 86, 0.4);
+  border-radius: 6px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.4);
+  background: var(--color-accent-primary);
 }
 
-/* ── Focus Styles ── */
-*:focus-visible {
-  outline: 2px solid #6366f1;
-  outline-offset: 2px;
-}
-
-/* ── Selection ── */
-::selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: #f1f5f9;
+/* ── Shimmer Animation ── */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
