@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import { User, Briefcase, MapPin, Globe, Tag, FileText, UserCircle, Sparkles } from 'lucide-react'
+import { User, Briefcase, MapPin, Globe, Tag, FileText, UserCircle, Sparkles, GraduationCap, Award, Calendar, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function ProfilePage() {
@@ -8,139 +8,159 @@ export default async function ProfilePage() {
 
     if (!user) return null
 
+    // Fetch primary profile
     const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
 
-    const { data: resume } = await supabase
-        .from('resumes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+    // Fetch relational data
+    const [{ data: skills }, { data: experiences }, { data: education }, { data: resume }] = await Promise.all([
+        supabase.from('profile_skills').select('skill_name').eq('user_id', user.id),
+        supabase.from('profile_experiences').select('*').eq('user_id', user.id).order('start_date', { ascending: false }),
+        supabase.from('profile_education_entries').select('*').eq('user_id', user.id).order('end_year', { ascending: false }),
+        supabase.from('resumes').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single()
+    ])
 
-    const preferences = profile?.preferences || {}
-    const roles = Array.isArray(preferences.roles) ? preferences.roles : []
-    const locations = Array.isArray(preferences.locations) ? preferences.locations : []
-    const keywords = Array.isArray(preferences.keywords) ? preferences.keywords : []
+    const completionScore = profile?.profile_completion || 0
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto relative z-10 w-full">
-            <div className="flex justify-between items-end flex-wrap gap-4">
-                <div>
-                    <h2 className="text-4xl font-bold tracking-tighter aurora-text mb-1">Professional Profile</h2>
-                    <p className="text-slate-400 font-light">This intelligence is used by the AI to filter and match jobs for you.</p>
+        <div className="space-y-8 max-w-[1200px] mx-auto relative z-10 w-full pb-20">
+            {/* Header Area */}
+            <div className="flex justify-between items-end flex-wrap gap-4 glass-panel ghost-border rounded-3xl p-8 relative overflow-hidden bg-gradient-to-r from-black/40 to-[var(--color-bg-primary)]">
+                <div className="absolute right-0 top-0 w-96 h-96 bg-[var(--color-accent-primary)]/10 blur-[100px] pointer-events-none rounded-full" />
+                
+                <div className="flex items-center gap-6 relative z-10 w-full lg:w-auto">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--color-accent-primary)]/20 to-[var(--color-neon-teal)]/20 border border-white/10 flex items-center justify-center shadow-[0_0_30px_rgba(133,173,255,0.15)] flex-shrink-0">
+                        <UserCircle size={48} className="text-slate-300" />
+                    </div>
+                    <div>
+                        <h2 className="text-4xl font-black tracking-tighter text-white mb-2">{profile?.full_name || user.email}</h2>
+                        <p className="text-xl text-[var(--color-neon-teal)] font-medium mb-1">{profile?.target_role || 'No Target Role Set'}</p>
+                        <div className="flex items-center gap-4 text-sm text-slate-400 font-medium">
+                            <span className="flex items-center gap-1.5"><MapPin size={16} /> {profile?.location || 'Unknown Location'}</span>
+                            <span className="flex items-center gap-1.5"><Briefcase size={16} /> {profile?.years_of_experience || 0} Years Exp.</span>
+                        </div>
+                    </div>
                 </div>
-                <Link
-                    href="/onboarding"
-                    className="magnetic-btn text-sm px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all font-semibold"
-                >
-                    Update Profile
-                </Link>
+
+                <div className="relative z-10 flex flex-col items-end gap-3 w-full lg:w-auto mt-6 lg:mt-0">
+                    <div className="text-right">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Intelligence Status</div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-neon-teal)]" style={{ width: `${completionScore}%` }} />
+                            </div>
+                            <span className="text-[var(--color-neon-teal)] font-black">{completionScore}%</span>
+                        </div>
+                    </div>
+                    <Link
+                        href="/profile/setup"
+                        className="magnetic-btn text-sm px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/15 transition-all font-semibold flex items-center gap-2"
+                    >
+                        Edit Intelligence
+                    </Link>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Basic Info */}
+                
+                {/* Left Column */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="glass-panel ghost-border rounded-2xl p-8 text-center flex flex-col items-center">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--color-accent-primary)]/20 to-[var(--color-neon-teal)]/20 border border-white/10 flex items-center justify-center mb-5 shadow-[0_0_20px_rgba(133,173,255,0.1)] relative group">
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--color-accent-primary)]/20 to-[var(--color-neon-teal)]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <UserCircle size={48} className="text-slate-400 relative z-10" />
-                        </div>
-                        <h3 className="font-bold text-lg text-white truncate w-full">{user.email}</h3>
-                        <p className="text-xs text-slate-500 mt-2 font-medium">Member since {new Date(user.created_at).toLocaleDateString()}</p>
+                    {/* Summary */}
+                    <div className="glass-panel ghost-border rounded-3xl p-6">
+                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Professional Summary</h4>
+                        <p className="text-slate-300 text-sm leading-relaxed font-light">
+                            {profile?.professional_summary || <span className="italic text-slate-500">No summary provided. Edit profile to add one.</span>}
+                        </p>
                     </div>
 
-                    <div className="glass-panel ghost-border rounded-2xl p-6 space-y-5">
-                        <h4 className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                            <Sparkles size={16} className="text-[var(--color-neon-teal)]" /> AI Persona
+                    {/* Preferences */}
+                    <div className="glass-panel ghost-border rounded-3xl p-6 space-y-5">
+                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                            <Sparkles size={16} className="text-[var(--color-soft-violet)]" /> Career Preferences
                         </h4>
                         <div className="space-y-4 pt-2 border-t border-white/5">
-                            <div className="flex items-center gap-3 text-sm text-slate-400 font-medium">
-                                <Briefcase size={18} className="text-[var(--color-accent-primary)]" />
-                                <span>{preferences.experience_level || 'Experience not set'}</span>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500 flex items-center gap-2"><Globe size={16} /> Work Mode</span>
+                                <span className="text-white font-medium">{profile?.preferred_work_mode || 'Any'}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-sm text-slate-400 font-medium">
-                                <Globe size={18} className="text-[var(--color-soft-violet)]" />
-                                <span>{preferences.remote_preference ? 'Open to Remote / Global' : 'On-site Local Only'}</span>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500 flex items-center gap-2"><MapPin size={16} /> Relocation</span>
+                                <span className="text-white font-medium">{profile?.willing_to_relocate ? 'Open' : 'No'}</span>
                             </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500 flex items-center gap-2"><DollarSign size={16} /> Expected Salary</span>
+                                <span className="text-[var(--color-neon-teal)] font-medium">{profile?.expected_salary_range || 'Not disclosed'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Socials */}
+                    <div className="glass-panel ghost-border rounded-3xl p-6">
+                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">External Links</h4>
+                        <div className="space-y-3">
+                            {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="block text-sm text-[var(--color-accent-primary)] hover:underline truncate">LinkedIn Profile</a>}
+                            {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noreferrer" className="block text-sm text-[var(--color-accent-primary)] hover:underline truncate">GitHub Profile</a>}
+                            {!profile?.linkedin_url && !profile?.github_url && <span className="text-slate-500 italic text-sm font-light">No links provided</span>}
                         </div>
                     </div>
                 </div>
 
-                {/* Detailed Preferences */}
+                {/* Right Column */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="glass-panel ghost-border rounded-3xl p-8 relative overflow-hidden">
-                        <div className="absolute -top-20 -right-20 w-64 h-64 bg-[var(--color-accent-primary)]/5 blur-3xl rounded-full pointer-events-none" />
-                        
-                        <h4 className="text-xl font-bold text-white mb-8 flex items-center gap-2 relative z-10">
-                            <Sparkles size={24} className="text-[var(--color-neon-teal)]" /> Intelligence Criteria
+                    
+                    {/* Skills */}
+                    <div className="glass-panel ghost-border rounded-3xl p-8">
+                        <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <Tag size={20} className="text-[var(--color-accent-primary)]" /> Core Competencies
                         </h4>
-
-                        <div className="space-y-8 relative z-10">
-                            <section>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-4">Target Roles</label>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {roles.length > 0 ? roles.map((role: string) => (
-                                        <span key={role} className="px-4 py-1.5 rounded-full bg-[var(--color-accent-primary)]/10 border border-[var(--color-accent-primary)]/30 text-[var(--color-accent-primary)] text-sm font-semibold backdrop-blur-md transition-all hover:bg-[var(--color-accent-primary)]/20">
-                                            {role}
-                                        </span>
-                                    )) : <span className="text-slate-500 italic text-sm font-light">No roles set</span>}
-                                </div>
-                            </section>
-
-                            <section>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-4">Target Locations</label>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {locations.length > 0 ? locations.map((loc: string) => (
-                                        <span key={loc} className="px-4 py-1.5 rounded-full bg-[var(--color-soft-violet)]/10 border border-[var(--color-soft-violet)]/30 text-[var(--color-soft-violet)] text-sm font-semibold backdrop-blur-md flex items-center gap-2 transition-all hover:bg-[var(--color-soft-violet)]/20">
-                                            <MapPin size={14} /> {loc}
-                                        </span>
-                                    )) : <span className="text-slate-500 italic text-sm font-light">No locations set</span>}
-                                </div>
-                            </section>
-
-                            <section>
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-4">Expertise Signals</label>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {keywords.length > 0 ? keywords.map((word: string) => (
-                                        <span key={word} className="px-4 py-1.5 rounded-full bg-[var(--color-neon-teal)]/10 border border-[var(--color-neon-teal)]/30 text-[var(--color-neon-teal)] text-sm font-semibold backdrop-blur-md flex items-center gap-2 transition-all hover:bg-[var(--color-neon-teal)]/20">
-                                            <Tag size={14} /> {word}
-                                        </span>
-                                    )) : <span className="text-slate-500 italic text-sm font-light">No signals set</span>}
-                                </div>
-                            </section>
+                        <div className="flex flex-wrap gap-2.5">
+                            {skills && skills.length > 0 ? skills.map((s: any) => (
+                                <span key={s.skill_name} className="px-4 py-1.5 rounded-full bg-[var(--color-accent-primary)]/10 border border-[var(--color-accent-primary)]/30 text-[var(--color-accent-primary)] text-sm font-semibold backdrop-blur-md">
+                                    {s.skill_name}
+                                </span>
+                            )) : <span className="text-slate-500 italic text-sm font-light">No skills mapped yet.</span>}
                         </div>
                     </div>
 
-                    {/* Resume Section */}
+                    {/* Experience */}
                     <div className="glass-panel ghost-border rounded-3xl p-8">
                         <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                            <FileText size={24} className="text-[var(--color-neon-teal)]" /> Core Memory (Resume)
+                            <Briefcase size={20} className="text-[var(--color-soft-violet)]" /> Experience
                         </h4>
-                        {resume ? (
-                            <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/5 shadow-sm">
-                                <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap line-clamp-[8] font-light">
-                                    {resume.resume_text}
-                                </p>
-                                <div className="mt-6 pt-5 border-t border-white/5 flex justify-between items-center text-xs text-slate-500 font-medium">
-                                    <span>Last sync: {new Date(resume.created_at).toLocaleDateString()}</span>
-                                    <Link href="/resume" className="text-[var(--color-neon-teal)] hover:text-white font-bold transition-colors">Update Memory &rarr;</Link>
+                        <div className="space-y-6 relative before:absolute before:inset-0 before:left-[11px] before:-top-2 before:-bottom-2 before:w-[2px] before:bg-white/5">
+                            {experiences && experiences.length > 0 ? experiences.map((exp: any) => (
+                                <div key={exp.id} className="relative pl-8">
+                                    <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-[var(--color-bg-primary)] border-4 border-white/10 flex items-center justify-center shadow-lg" />
+                                    <h5 className="text-lg font-bold text-white">{exp.role_title}</h5>
+                                    <p className="text-[var(--color-soft-violet)] font-semibold text-sm mb-2">{exp.company_name}</p>
+                                    <div className="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                        {exp.start_date || 'Unknown'} — {exp.is_current ? 'Present' : (exp.end_date || 'Unknown')}
+                                    </div>
+                                    {exp.description && <p className="text-slate-400 text-sm leading-relaxed">{exp.description}</p>}
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="text-center py-10 border-2 border-dashed border-white/10 rounded-2xl bg-white/[0.01] group hover:border-white/20 transition-colors">
-                                <FileText size={40} className="text-slate-500 mx-auto mb-4 group-hover:text-[var(--color-neon-teal)] transition-colors" />
-                                <p className="text-slate-400 text-sm mb-6 font-light">You haven&apos;t uploaded your core memory yet.</p>
-                                <Link href="/onboarding" className="text-sm font-bold text-white hover:text-white bg-white/10 hover:bg-white/15 px-6 py-2.5 rounded-xl border border-white/10 transition-all">
-                                    Upload Document
-                                </Link>
-                            </div>
-                        )}
+                            )) : <span className="text-slate-500 italic text-sm font-light relative pl-8">No experience recorded.</span>}
+                        </div>
                     </div>
+
+                    {/* Education */}
+                    <div className="glass-panel ghost-border rounded-3xl p-8">
+                        <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <GraduationCap size={20} className="text-[var(--color-neon-teal)]" /> Education
+                        </h4>
+                        <div className="space-y-6 relative before:absolute before:inset-0 before:left-[11px] before:-top-2 before:-bottom-2 before:w-[2px] before:bg-white/5">
+                            {education && education.length > 0 ? education.map((edu: any) => (
+                                <div key={edu.id} className="relative pl-8">
+                                    <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-[var(--color-bg-primary)] border-4 border-[var(--color-neon-teal)]/20 shadow-lg" />
+                                    <h5 className="text-lg font-bold text-white">{edu.institution_name}</h5>
+                                    <p className="text-[var(--color-neon-teal)] font-medium text-sm mb-1">{edu.degree} in {edu.field_of_study}</p>
+                                </div>
+                            )) : <span className="text-slate-500 italic text-sm font-light relative pl-8">No education recorded.</span>}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

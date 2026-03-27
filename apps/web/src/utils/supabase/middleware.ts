@@ -35,21 +35,44 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
+  // Protected routes checking
+  const protectedRoutes = ['/dashboard', '/jobs', '/discover', '/digest', '/resume', '/profile']
   
-  if (!user && request.nextUrl.pathname.startsWith('/onboarding')) {
-     return NextResponse.redirect(new URL('/login', request.url))
+  const isProtectedRoute = protectedRoutes.some(route => 
+    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(`${route}/`)
+  )
+
+  const isSetupRoute = request.nextUrl.pathname === '/profile/setup'
+
+  if (!user && (isProtectedRoute || request.nextUrl.pathname.startsWith('/onboarding') || isSetupRoute)) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // Redirect to dashboard if logged in and visiting login
   if (user && request.nextUrl.pathname === '/login') {
      return NextResponse.redirect(new URL('/dashboard', request.url))
   }
-  
-  // Basic onboarding check: if user has no profile, redirect to onboarding? (Can implementing later)
+
+  // Onboarding enforcement
+  if (user && isProtectedRoute && !isSetupRoute) {
+    // Check completion status efficiently
+    let isCompleted = user.user_metadata?.onboarding_completed
+
+    // Fallback to database check if not in metadata
+    if (isCompleted === undefined) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single()
+      
+      isCompleted = profile?.onboarding_completed ?? false
+    }
+
+    if (!isCompleted) {
+       return NextResponse.redirect(new URL('/profile/setup', request.url))
+    }
+  }
 
   return response
 }
