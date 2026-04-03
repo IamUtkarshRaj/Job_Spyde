@@ -1,3 +1,0 @@
-C:\Users\Shivam\OneDrive\Desktop\Job Spyde\apps\agent\test_ddgs.py:5: RuntimeWarning: This package (`duckduckgo_search`) has been renamed to `ddgs`! Use `pip install ddgs` instead.
-  results = DDGS().text("software engineer remote jobs", max_results=5)
-[]

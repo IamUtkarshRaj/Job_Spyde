@@ -7,16 +7,16 @@ from app.collectors.lever import LeverCollector
 from app.collectors.ashby import AshbyCollector
 from app.collectors.jobspy_collector import JobSpyCollector
 
+from app.collectors.playwright_scraper import CustomPlaywrightCollector
+
 class CollectorOrchestrator:
     def __init__(self):
-        # We can dynamically load target companies from a DB later
-        target_companies = ["vimeo", "figma", "notion", "stripe", "plaid"]
-        
+        # By removing the specific company-based ATS collectors (Greenhouse/Lever/Ashby),
+        # we now rely purely on job boards (like JobSpy or our Playwright scraper)
+        # to search globally across all companies.
         self.collectors = [
             JobSpyCollector(),
-            GreenhouseCollector(companies=target_companies),
-            LeverCollector(companies=target_companies),
-            AshbyCollector(companies=target_companies)
+            CustomPlaywrightCollector()
         ]
         
     async def run_all(self, query: JobFilter) -> List[CollectedJob]:

@@ -10,7 +10,7 @@ class GreenhouseCollector(BaseCollector):
 
     async def collect(self, query: JobFilter) -> List[CollectedJob]:
         all_jobs = []
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             for company in self.companies:
                 url = f"https://boards-api.greenhouse.io/v1/boards/{company}/jobs"
                 try:

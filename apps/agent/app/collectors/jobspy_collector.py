@@ -54,7 +54,7 @@ class JobSpyCollector(BaseCollector):
                 print(f"Error scraping {site}: {e}")
             return site_jobs
 
-        sites = ["indeed", "linkedin", "zip_recruiter", "glassdoor", "google", "naukri"]
+        sites = ["indeed", "linkedin", "zip_recruiter", "google"]
         tasks = [scrape_site(site) for site in sites]
         results = await asyncio.gather(*tasks)
         

@@ -28,16 +28,20 @@ export default function DiscoverPage() {
                     return
                 }
 
-                // Fetch preferences
-                const { data: profile } = await supabase.from('profiles').select('preferences').eq('id', user.id).single()
+                // Fetch preferences and top-level target_role column (Bypassing Python RLS blocks)
+                const { data: profile } = await supabase.from('profiles').select('preferences, target_role, years_of_experience').eq('id', user.id).single()
                 const prefs = profile?.preferences || {}
+                
+                const rawRole = profile?.target_role || prefs.roles || prefs.role || prefs.targetRole
+                const formattedRoles = rawRole ? (Array.isArray(rawRole) ? rawRole : [String(rawRole)]) : []
 
                 const payload = {
                     user_id: user.id,
-                    roles: prefs.roles || [],
+                    roles: formattedRoles,
                     locations: prefs.locations || [],
                     remote: prefs.remote_preference || false,
-                    keywords: prefs.keywords || []
+                    keywords: prefs.keywords || [],
+                    years_of_experience: profile?.years_of_experience || prefs.experience_level || prefs.years_of_experience || ""
                 }
 
                 setStatusMessage('Scraping and matching jobs (this may take a minute)...')
@@ -108,13 +112,11 @@ export default function DiscoverPage() {
                                 {job.description}
                             </p>
                         </div>
-                        <div className="flex justify-between items-center mt-auto pt-4 border-t border-white/5 relative z-20">
+                        <div className="flex justify-between items-center mt-auto pt-4 border-t border-white/5 relative z-30">
                             <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-white transition-colors">
                                 <Navigation size={14} className="text-[var(--color-neon-teal)]" /> Check Posting
                             </a>
-                            <div className="z-30">
-                                <JobSaveButton job={job} />
-                            </div>
+                            <JobSaveButton job={job} />
                         </div>
                     </div>
                 ))}

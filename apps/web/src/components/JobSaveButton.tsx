@@ -1,20 +1,38 @@
 'use client'
 
 import { saveJob } from '@/app/(app)/discover/actions'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Bookmark } from 'lucide-react'
 
 export function JobSaveButton({ job }: { job: any }) {
     const [loading, setLoading] = useState(false)
     const [saved, setSaved] = useState(false)
+    const [mounted, setMounted] = useState(false)
 
-    const handleSave = async () => {
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const handleSave = async (e: React.MouseEvent) => {
+        // Prevent event bubbling if needed
+        e.preventDefault()
+        e.stopPropagation()
+        
         setLoading(true)
         const res = await saveJob(job)
         setLoading(false)
         if (res?.success) {
             setSaved(true)
         }
+    }
+
+    // Return a similar-looking placeholder during hydration to prevent mismatch
+    if (!mounted) {
+        return (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 text-slate-500 text-sm rounded-xl font-semibold border border-white/10 opacity-50">
+                <Bookmark size={16} /> Save Job
+            </div>
+        )
     }
 
     if (saved) {

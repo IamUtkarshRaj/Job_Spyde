@@ -11,8 +11,25 @@ class Resume(BaseModel):
     id: Optional[str] = None
     user_id: str
     storage_path: str
-    resume_text: str
-    created_at: Optional[datetime] = None
+class Project(BaseModel):
+    name: str
+    url: Optional[str] = None
+    technologies: Optional[str] = None
+    description: Optional[str] = None
+
+class ProfileExtraction(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    portfolio_url: Optional[str] = None
+    professional_summary: Optional[str] = None
+
+class ResumeExtraction(BaseModel):
+    profile: ProfileExtraction
+    projects: List[Project]
+    extraction_method: str = "ai" # "ai" or "basic"
 
 class ResumeDraft(BaseModel):
     summary: str

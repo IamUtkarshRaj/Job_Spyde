@@ -10,7 +10,7 @@ class LeverCollector(BaseCollector):
 
     async def collect(self, query: JobFilter) -> List[CollectedJob]:
         all_jobs = []
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             for company in self.companies:
                 url = f"https://api.lever.co/v0/postings/{company}"
                 try:

@@ -1,0 +1,3 @@
+# Ignore massive local models
+models/
+.venv/

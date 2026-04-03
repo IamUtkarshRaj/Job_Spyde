@@ -11,14 +11,14 @@ class MatchScore(BaseModel):
     score: int = Field(description="Match score from 0-100")
     reasoning: str = Field(description="Explanation of the score and specific skill overlaps or gaps")
 
-async def match_single_job(job: Any, resume_text: str, score_threshold: int = 60, use_ai: bool = True) -> Any | None:
+async def match_single_job(job: Any, resume_text: str, roles_list: list, skills_list: list, locations_list: list, years_exp: str, score_threshold: int = 60, use_ai: bool = True) -> Any | None:
     """Scores a single job using AI or default fallback."""
     llm = get_llm()
     parser = PydanticOutputParser(pydantic_object=MatchScore)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert technical recruiter matching candidates to jobs.\nEvaluate the match between the resume and job description. Assign a score from 0-100.\n{format_instructions}"),
-        ("user", "Candidate Resume: {resume}\n\nJob Title: {title}\nCompany: {company}\nDescription: {description}\n\nAnalyze the match and provide a score.")
+        ("system", "You are an expert technical recruiter matching candidates to jobs.\nEvaluate the match between the candidate's profile (Skills, Experience, Resume) and the job description. Assign a score from 0-100.\nPenalize heavily if the candidate's Years of Experience do not meet the job's minimum requisite, or if the Job Title completely misaligns with the candidate's target role. Give a significant score boost if the company is a startup.\n{format_instructions}"),
+        ("user", "Candidate Profile:\n- Target Roles: {roles}\n- Target Locations: {locations}\n- Explicit Skills: {skills}\n- Years of Experience: {years_exp}\n- Resume Text: {resume}\n\nJob Title: {title}\nCompany: {company}\nDescription: {description}\n\nAnalyze the match and provide a score.")
     ])
     
     chain = prompt | llm | parser
@@ -26,6 +26,10 @@ async def match_single_job(job: Any, resume_text: str, score_threshold: int = 60
     try:
         if use_ai:
             result = await chain.ainvoke({
+                "roles": ", ".join(roles_list) if roles_list else "Any",
+                "locations": ", ".join(locations_list) if locations_list else "Any",
+                "skills": ", ".join(skills_list) if skills_list else "None provided",
+                "years_exp": str(years_exp) if years_exp else "Not specified",
                 "resume": resume_text,
                 "title": job.title,
                 "company": job.company,
@@ -76,6 +80,10 @@ async def job_matching_node(state: AgentState) -> Dict[str, Any]:
         res = await match_single_job(
             job, 
             resume_text, 
+            roles_list=[],
+            skills_list=[],
+            locations_list=[],
+            years_exp="",
             use_ai=(i < 3)
         )
         if res:

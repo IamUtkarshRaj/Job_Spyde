@@ -4,10 +4,12 @@ from pydantic import BaseModel, Field
 
 class JobFilter(BaseModel):
     user_id: Optional[str] = Field(description="User ID for fetching profile/resume", default=None)
-    roles: List[str] = Field(description="Target job roles (e.g. Software Engineer)")
-    locations: List[str] = Field(description="Target locations")
+    roles: List[str] = Field(description="Target job roles (e.g. Software Engineer)", default_factory=list)
+    locations: List[str] = Field(description="Target locations", default_factory=list)
     remote: bool = Field(description="Whether remote is preferred", default=False)
     keywords: List[str] = Field(description="Keywords to look for in description", default_factory=list)
+    skills: List[str] = Field(description="Specific technical skills derived from user profile", default_factory=list)
+    years_of_experience: Optional[str] = Field(description="Years of experience the user has", default=None)
     experience_level: Optional[str] = Field(description="Entry, Mid, Senior, etc.", default=None)
 
 class CollectedJob(BaseModel):
