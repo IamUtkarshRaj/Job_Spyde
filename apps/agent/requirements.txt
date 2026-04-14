@@ -7,7 +7,7 @@ langchain-google-genai
 pydantic
 pydantic-settings
 httpx
-python-jobspy
+# python-jobspy
 pandas
 beautifulsoup4
 supabase
