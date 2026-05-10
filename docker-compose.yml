@@ -7,19 +7,43 @@ services:
       - "8000:8000"
     volumes:
       - ./apps/agent:/app
+    env_file:
+      - ./apps/agent/.env
     environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-""}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - PLAYWRIGHT_HEADLESS=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
     restart: unless-stopped
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+
+  web:
+    build:
+      context: ./apps/web
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_AGENT_URL: http://agent:8000
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/web/.env.local
+    environment:
+      - NEXT_PUBLIC_AGENT_URL=http://agent:8000
+    restart: unless-stopped
+    depends_on:
+      - agent
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:

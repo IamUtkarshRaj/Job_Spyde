@@ -1,4 +1,4 @@
-import { Search, Bell, Sparkles } from 'lucide-react'
+import { Search, Bell, Sparkles, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 
 interface TopbarProps {
@@ -39,13 +39,13 @@ export function Topbar({ userEmail, userName }: TopbarProps) {
                 >
                     <Bell size={20} />
                 </button>
-                <Link
-                    href="/digest"
-                    className="text-[var(--color-neon-teal)] hover:text-white transition-opacity"
-                    aria-label="Daily Digest"
+                <a
+                    href="#"
+                    className="text-slate-400 hover:text-white transition-opacity"
+                    aria-label="Help"
                 >
-                    <Sparkles size={20} />
-                </Link>
+                    <HelpCircle size={20} />
+                </a>
 
                 <Link href="/profile" className="flex items-center gap-3 ml-2 border-l border-white/10 pl-6 cursor-pointer hover:opacity-80 transition-opacity">
                     <div className="text-right hidden sm:block">

@@ -8,20 +8,22 @@ export default async function ProfilePage() {
 
     if (!user) return null
 
-    // Fetch primary profile
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-    // Fetch relational data
-    const [{ data: skills }, { data: experiences }, { data: education }, { data: resume }] = await Promise.all([
+    // Fetch all profile data in parallel to optimize load times
+    const [
+        { data: dbProfile },
+        { data: skills }, 
+        { data: experiences }, 
+        { data: education }, 
+        { data: resume }
+    ] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
         supabase.from('profile_skills').select('skill_name').eq('user_id', user.id),
         supabase.from('profile_experiences').select('*').eq('user_id', user.id).order('start_date', { ascending: false }),
         supabase.from('profile_education_entries').select('*').eq('user_id', user.id).order('end_year', { ascending: false }),
         supabase.from('resumes').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single()
     ])
+
+    const profile = dbProfile || null
 
     const completionScore = profile?.profile_completion || 0
 

@@ -252,3 +252,34 @@ body {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* ── Kanban Scrollbar ── */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(68, 71, 86, 0.3);
+  border-radius: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-primary);
+}
+
+/* ── No-scrollbar for tabs ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Pulse glow for active indicators ── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(105, 246, 184, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(105, 246, 184, 0.6); }
+}

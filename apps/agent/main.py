@@ -1,15 +1,16 @@
 import sys
+import os
 import asyncio
+from dotenv import load_dotenv
+
+load_dotenv()  # Extremely important to load .env so Redis correctly maps to Redislabs!
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.router import api_router
-from app.config import get_settings
-
-settings = get_settings()
+from routers import health, agents, feedback, resume, jobs
 
 app = FastAPI(
     title="Job Spyde Agent Service",
@@ -20,11 +21,21 @@ app = FastAPI(
 # Setup CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, restrict this to frontend URL
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include API Router
-app.include_router(api_router)
+# Include API Routers
+app.include_router(health.router)
+app.include_router(agents.router)
+app.include_router(feedback.router)
+app.include_router(resume.router)
+app.include_router(jobs.router)
+
+if __name__ == "__main__":
+    import uvicorn
+    # Passing the raw `app` object instead of a string prevents Uvicorn from spawning 
+    # child processes for hot-reloading, guaranteeing the Proactor Event Loop remains intact!
+    uvicorn.run(app, host="127.0.0.1", port=8000)

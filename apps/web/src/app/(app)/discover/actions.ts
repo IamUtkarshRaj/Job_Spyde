@@ -32,11 +32,7 @@ export async function saveJob(jobData: any) {
     description: jobData.description,
     posted_at: validPostedAt,
     match_score: matchScore,
-    status: 'saved',
-    // Capture any metadata from the agent (salary, job type etc) 
-    // This assumes a 'metadata' column might exist. 
-    // If it doesn't, Supabase ignores fields not in the table.
-    metadata: jobData.metadata || {}
+    status: 'saved'
   }, { onConflict: 'user_id,url' })
 
   if (error) {

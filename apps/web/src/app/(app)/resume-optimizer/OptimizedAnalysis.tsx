@@ -6,9 +6,13 @@ interface OptimizedAnalysisProps {
     jobDescription: string
     setJobDescription: (jd: string) => void
     selectedJob: any
+    onOptimize: () => void
+    isOptimizing: boolean
 }
 
-export function OptimizedAnalysis({ jobDescription, setJobDescription, selectedJob }: OptimizedAnalysisProps) {
+export function OptimizedAnalysis({ jobDescription, setJobDescription, selectedJob, onOptimize, isOptimizing }: OptimizedAnalysisProps) {
+    const canOptimize = (!!selectedJob || jobDescription.length > 20) && !isOptimizing
+
     return (
         <div className="glass-panel ghost-border rounded-3xl p-8 relative overflow-hidden group">
             <div className="absolute -top-32 -left-32 w-96 h-96 bg-[var(--color-neon-teal)]/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-[var(--color-neon-teal)]/10 transition-colors duration-1000" />
@@ -38,23 +42,29 @@ export function OptimizedAnalysis({ jobDescription, setJobDescription, selectedJ
 
                 <div className="flex flex-wrap gap-4 pt-2">
                     <button 
+                        onClick={onOptimize}
+                        disabled={!canOptimize}
                         className={`
                             flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-8 py-3 
                             text-xs rounded-xl font-extrabold transition-all duration-300 active:scale-95
-                            ${selectedJob || jobDescription.length > 100
+                            ${canOptimize
                                 ? 'bg-[var(--color-accent-primary)] text-white hover:bg-[var(--color-accent-hover)] hover:shadow-[0_0_20px_rgba(133,173,255,0.4)]'
                                 : 'bg-slate-900 text-slate-500 cursor-not-allowed opacity-50 border border-white/5'
                             }
                         `}
-                        disabled={!selectedJob && jobDescription.length < 100}
                     >
-                        <Sparkles size={16} />
-                        Next: Optimize Resume
-                        <ArrowRight size={14} className="ml-1" />
-                    </button>
-
-                    <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95">
-                        Update Analysis
+                        {isOptimizing ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                Optimizing...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles size={16} />
+                                Optimize Resume
+                                <ArrowRight size={14} className="ml-1" />
+                            </>
+                        )}
                     </button>
                 </div>
 
@@ -63,7 +73,7 @@ export function OptimizedAnalysis({ jobDescription, setJobDescription, selectedJ
                         <BarChart3 size={18} className="text-orange-500 shrink-0 mt-0.5" />
                         <p className="text-[10px] text-orange-200/70 font-medium leading-relaxed">
                             <span className="text-orange-500 font-bold uppercase mr-1">Advisory:</span> 
-                            Select a saved job from the sidebar to activate the matching engine and generate specific optimization insights.
+                            Select a saved job from the sidebar or paste a job description to activate the optimization engine.
                         </p>
                     </div>
                 )}

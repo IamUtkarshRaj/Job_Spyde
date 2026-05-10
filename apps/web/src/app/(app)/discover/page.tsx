@@ -12,8 +12,12 @@ export default function DiscoverPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [statusMessage, setStatusMessage] = useState('Initializing agents...')
+    const [refreshKey, setRefreshKey] = useState(0)
+    const [isForceRefresh, setIsForceRefresh] = useState(false)
 
     useEffect(() => {
+        const abortController = new AbortController()
+
         const fetchJobs = async () => {
             setLoading(true)
             setError(null)
@@ -35,39 +39,96 @@ export default function DiscoverPage() {
                 const rawRole = profile?.target_role || prefs.roles || prefs.role || prefs.targetRole
                 const formattedRoles = rawRole ? (Array.isArray(rawRole) ? rawRole : [String(rawRole)]) : []
 
+                // Bridge Resume Text for Local LLM cosine scoring
+                const { data: resumeData } = await supabase.from('resumes').select('parsed_text').eq('user_id', user.id).maybeSingle()
+                const rawResumeText = resumeData?.parsed_text || ""
+                
                 const payload = {
                     user_id: user.id,
                     roles: formattedRoles,
                     locations: prefs.locations || [],
                     remote: prefs.remote_preference || false,
                     keywords: prefs.keywords || [],
-                    years_of_experience: profile?.years_of_experience || prefs.experience_level || prefs.years_of_experience || ""
+                    years_of_experience: profile?.years_of_experience || prefs.experience_level || prefs.years_of_experience || "",
+                    resume_text: rawResumeText,
+                    force_refresh: isForceRefresh
                 }
 
                 setStatusMessage('Scraping and matching jobs (this may take a minute)...')
 
+                const { data: { session } } = await supabase.auth.getSession()
+                const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`
+                }
+
                 const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL || 'http://127.0.0.1:8000'
                 const response = await fetch(`${AGENT_URL}/v1/jobs/collect`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers,
                     body: JSON.stringify(payload),
+                    signal: abortController.signal
                 })
 
                 if (!response.ok) throw new Error('Failed to connect to agent.')
 
-                const data = await response.json()
-                setJobs(data)
+                setStatusMessage('Receiving live matches...')
+                
+                // Read Server-Sent Events (SSE) Stream
+                if (!response.body) throw new Error('No response body')
+                const reader = response.body.getReader()
+                const decoder = new TextDecoder('utf-8')
+                
+                let buffer = ''
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
+                    
+                    buffer += decoder.decode(value, { stream: true })
+                    const chunks = buffer.split('\n\n')
+                    buffer = chunks.pop() || ''
+                    
+                    for (const chunk of chunks) {
+                        if (chunk.startsWith('data: ')) {
+                            const jsonStr = chunk.slice(6)
+                            try {
+                                const jobObj = JSON.parse(jsonStr)
+                                setJobs(prev => {
+                                    // Prevent duplicate keys if React double mounts or SSE repeats
+                                    const exists = prev.find(j => j.url === jobObj.url || j.title === jobObj.title)
+                                    if (exists) return prev
+                                    return [...prev, jobObj]
+                                })
+                            } catch (e) {
+                                console.error('SSE JSON parse error', e)
+                            }
+                        }
+                    }
+                }
+
                 setStatusMessage('Discovery complete!')
             } catch (err: any) {
+                if (err.name === 'AbortError') {
+                    console.log('Discovery fetch aborted by React hook unmount')
+                    return // Silent exit if component unloaded
+                }
                 console.error('Discovery error:', err)
                 setError(err.message || 'An error occurred while discovering jobs.')
             } finally {
-                setLoading(false)
+                // Ensure double-rendering in strict-mode doesn't toggle load wrongly
+                if (!abortController.signal.aborted) {
+                    setLoading(false)
+                    setIsForceRefresh(false)
+                }
             }
         }
 
         fetchJobs()
-    }, [])
+
+        return () => {
+            abortController.abort() // Immediately kill in-flight SSE strings if strictly unmounted
+        }
+    }, [refreshKey])
 
     return (
         <div className="space-y-8 relative z-10 w-full">
@@ -79,6 +140,15 @@ export default function DiscoverPage() {
                             <Loader2 size={14} className="animate-spin" />
                             {statusMessage}
                         </div>
+                    )}
+                    {!loading && (
+                        <button 
+                            onClick={() => { setIsForceRefresh(true); setRefreshKey(prev => prev + 1); }}
+                            className="bg-white/5 border border-white/10 hover:border-[var(--color-accent-primary)]/50 hover:bg-white/10 px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2"
+                        >
+                            <Sparkles size={14} className="text-[var(--color-accent-primary)]" />
+                            Refresh Live Matches
+                        </button>
                     )}
                 </div>
                 <Link href="/dashboard" className="text-sm font-semibold text-slate-400 hover:text-white flex items-center gap-2 transition-colors bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10">

@@ -28,20 +28,18 @@ export default async function DashboardPage({
         query = query.in('status', ['applied', 'rejected', 'ghosted'])
     }
 
-    const { data: jobs } = await query
-
-    // Fetch counts for summary strip
-    const { count: discoveredCount } = await supabase
-        .from('jobs').select('*', { count: 'exact', head: true })
-        .eq('user_id', user!.id).eq('status', 'discovered')
-
-    const { count: savedCount } = await supabase
-        .from('jobs').select('*', { count: 'exact', head: true })
-        .eq('user_id', user!.id).in('status', ['saved', 'prepared'])
-
-    const { count: appliedCount } = await supabase
-        .from('jobs').select('*', { count: 'exact', head: true })
-        .eq('user_id', user!.id).in('status', ['applied', 'interview', 'offer'])
+    // Fetch data and counts in parallel
+    const [
+        { data: jobs },
+        { count: discoveredCount },
+        { count: savedCount },
+        { count: appliedCount }
+    ] = await Promise.all([
+        query,
+        supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('user_id', user!.id).eq('status', 'discovered'),
+        supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('user_id', user!.id).in('status', ['saved', 'prepared']),
+        supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('user_id', user!.id).in('status', ['applied', 'interview', 'offer'])
+    ])
 
     const tabs = [
         { id: 'discovered', label: 'Discovered Tasks' },

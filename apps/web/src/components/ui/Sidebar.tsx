@@ -3,13 +3,15 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Logo } from './Logo'
-import { LayoutDashboard, FileText, Sparkles, Search, Settings, LogOut, Menu, X, Crown, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, FileText, Sparkles, Search, Settings, LogOut, Menu, X, Crown, HelpCircle, Kanban, BarChart3, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/pipeline', label: 'Job Pipeline', icon: Kanban },
     { href: '/discover', label: 'Job Search', icon: Search },
-    { href: '/resume-optimizer', label: 'Resume Optimizer', icon: Sparkles },
+    { href: '/resume-optimizer', label: 'Resume Optimizer', icon: TrendingUp },
+    { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/profile', label: 'Profile', icon: Settings },
     { href: '/digest', label: 'Digest', icon: Sparkles },
 ]
@@ -25,13 +27,13 @@ export function Sidebar({ userEmail }: SidebarProps) {
     const navContent = (
         <div className="relative z-10 flex flex-col h-full">
             {/* Brand Header */}
-            <div className="px-8 py-8">
+            <div className="px-6 py-6">
                 <Logo />
                 <p className="text-[10px] text-slate-500 tracking-[0.2em] mt-2 uppercase font-medium">Obsidian Observatory</p>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 space-y-1 mt-2" aria-label="Main navigation">
+            <nav className="flex-1 overflow-y-auto no-scrollbar px-4 space-y-1 mt-2 pb-4" aria-label="Main navigation">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
                     const Icon = item.icon
@@ -58,33 +60,28 @@ export function Sidebar({ userEmail }: SidebarProps) {
             </nav>
 
             {/* Footer Actions */}
-            <div className="px-4 pb-8 space-y-2">
+            <div className="px-4 pb-4 space-y-1.5">
                 {/* Upgrade to Pro Card */}
-                <div className="p-4 mb-4 rounded-xl bg-gradient-to-br from-[var(--color-accent-primary)]/10 to-[var(--color-neon-teal)]/10 border border-white/5">
-                    <p className="text-xs text-white font-bold mb-2 flex items-center gap-1.5">
+                <div className="p-3 mb-2 rounded-xl bg-gradient-to-br from-[var(--color-accent-primary)]/10 to-[var(--color-neon-teal)]/10 border border-white/5">
+                    <p className="text-[11px] text-white font-bold mb-1.5 flex items-center gap-1.5">
                         <Crown size={12} className="text-[var(--color-neon-teal)]" />
                         Upgrade to Pro
                     </p>
-                    <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">Get advanced AI insights and priority job matching.</p>
-                    <button className="w-full py-2 bg-[var(--color-neon-teal)] text-slate-950 text-[10px] font-bold rounded-lg hover:shadow-[0_0_15px_rgba(105,246,184,0.4)] transition-all">
+                    <p className="text-[9px] text-slate-400 mb-2.5 leading-relaxed">Get advanced AI insights and priority matching.</p>
+                    <button className="w-full py-1.5 bg-[var(--color-neon-teal)] text-slate-950 text-[10px] font-bold rounded-lg hover:shadow-[0_0_15px_rgba(105,246,184,0.4)] transition-all">
                         Go Premium
                     </button>
                 </div>
 
-                <a className="group flex items-center gap-4 px-4 py-2 text-slate-400 hover:text-white transition-colors duration-300" href="#">
-                    <HelpCircle size={18} />
-                    <span className="text-sm">Help</span>
-                </a>
-
-                <div className="px-4 py-2 text-xs font-medium text-slate-500 truncate">
+                <div className="px-4 py-1 text-[10px] font-medium text-slate-500 truncate">
                     {userEmail}
                 </div>
 
                 <form action="/auth/signout" method="post">
                     <button
-                        className="flex items-center gap-4 px-4 py-2 w-full text-sm font-medium text-slate-400 hover:text-white transition-all duration-200"
+                        className="flex items-center gap-4 px-4 py-1.5 w-full text-xs font-medium text-slate-400 hover:text-white transition-all duration-200"
                     >
-                        <LogOut size={18} />
+                        <LogOut size={16} />
                         Sign Out
                     </button>
                 </form>
