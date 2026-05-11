@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Create non-root user
 RUN groupadd --system --gid 1001 appgroup && \
-    useradd --system --uid 1001 --gid appgroup appuser
+    useradd --system --uid 1001 --gid appgroup -m -d /home/appuser appuser
 
 # --- Dependencies layer (cached separately) ---
 FROM base AS dependencies
@@ -66,8 +66,7 @@ COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy Playwright browsers (installed by root in dependencies stage)
-COPY --from=dependencies /root/.cache/ms-playwright /home/appuser/.cache/ms-playwright
-RUN chown -R appuser:appgroup /home/appuser/.cache
+COPY --chown=appuser:appgroup --from=dependencies /root/.cache/ms-playwright /home/appuser/.cache/ms-playwright
 
 # Copy application code
 COPY . .
