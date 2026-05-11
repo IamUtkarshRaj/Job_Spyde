@@ -1,0 +1,40 @@
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+.venv
+venv
+ENV
+
+# Environment files (injected at runtime)
+.env
+.env.*
+!.env.example
+
+# Test files
+test_*.py
+check_db.py
+
+# Debug artifacts
+naukri_debug.png
+naukri.html
+schema_migration.sql
+
+# Local models (large)
+models/
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docs
+README.md

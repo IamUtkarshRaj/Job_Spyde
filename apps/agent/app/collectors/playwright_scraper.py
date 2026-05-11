@@ -4,7 +4,7 @@ import urllib.parse
 import re
 from typing import List
 from playwright.sync_api import sync_playwright
-from playwright_stealth import Stealth
+from playwright_stealth import stealth_sync
 from app.models.job import CollectedJob, JobFilter
 
 class CustomPlaywrightCollector:
@@ -30,7 +30,7 @@ class CustomPlaywrightCollector:
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             page = context.new_page()
-            Stealth().apply_stealth_sync(page)
+            stealth_sync(page)
             
             try:
                 page.goto(url, wait_until="domcontentloaded", timeout=20000)
@@ -121,7 +121,7 @@ class CustomPlaywrightCollector:
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             page = context.new_page()
-            Stealth().apply_stealth_sync(page)
+            stealth_sync(page)
             
             try:
                 page.goto(target_url, wait_until="domcontentloaded", timeout=30000)
@@ -190,7 +190,7 @@ class CustomPlaywrightCollector:
                 user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
             )
             page = context.new_page()
-            Stealth().apply_stealth_sync(page)
+            stealth_sync(page)
             
             try:
                 target_url = f"https://www.glassdoor.com/Job/jobs.htm?sc.keyword={search_term}&locT=C&locId=1&locKeyword={location}&fromAge=1"
@@ -264,7 +264,7 @@ class CustomPlaywrightCollector:
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             page = context.new_page()
-            Stealth().apply_stealth_sync(page)
+            stealth_sync(page)
             
             try:
                 page.goto(target_url, wait_until="domcontentloaded", timeout=30000)
@@ -335,7 +335,7 @@ class CustomPlaywrightCollector:
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             page = context.new_page()
-            Stealth().apply_stealth_sync(page)
+            stealth_sync(page)
             
             try:
                 page.goto(target_url, wait_until="domcontentloaded", timeout=30000)

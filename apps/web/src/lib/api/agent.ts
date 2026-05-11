@@ -6,8 +6,8 @@
 import { createClient } from '@/utils/supabase/client'
 
 const AGENT_API_URL = typeof window !== 'undefined'
-  ? (process.env.NEXT_PUBLIC_AGENT_URL || 'http://127.0.0.1:8000')
-  : (process.env.NEXT_PUBLIC_AGENT_URL || 'http://127.0.0.1:8000')
+  ? (process.env.NEXT_PUBLIC_AGENT_URL || '/api/agent')
+  : (process.env.NEXT_PUBLIC_AGENT_URL || '/api/agent')
 
 /**
  * Gets the current Supabase session token to pass to the agent API.

@@ -1,4 +1,10 @@
-version: '3.8'
+# ==========================================
+# JobSpyde — Development Docker Compose
+# ==========================================
+# Usage: docker compose up --build
+# This is for LOCAL DEVELOPMENT only. For production, use docker-compose.prod.yml
+#
+# All services read from the single root .env file.
 
 services:
   agent:
@@ -6,14 +12,14 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./apps/agent:/app
+      - ./apps/agent:/app  # Hot reload — mount source code
     env_file:
-      - ./apps/agent/.env
+      - .env
     environment:
       - PLAYWRIGHT_HEADLESS=true
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
+      - ENVIRONMENT=development
+      - CORS_ORIGINS=http://localhost:3000
+      - NEXT_PUBLIC_AGENT_URL=http://agent:8000
     restart: unless-stopped
     depends_on:
       redis:
@@ -29,7 +35,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./apps/web/.env.local
+      - .env
     environment:
       - NEXT_PUBLIC_AGENT_URL=http://agent:8000
     restart: unless-stopped

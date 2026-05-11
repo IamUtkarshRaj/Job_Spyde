@@ -62,7 +62,7 @@ export default function DiscoverPage() {
                     headers['Authorization'] = `Bearer ${session.access_token}`
                 }
 
-                const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL || 'http://127.0.0.1:8000'
+                const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL || '/api/agent'
                 const response = await fetch(`${AGENT_URL}/v1/jobs/collect`, {
                     method: 'POST',
                     headers,

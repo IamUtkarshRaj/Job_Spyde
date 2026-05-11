@@ -10,7 +10,7 @@ playwright-stealth==1.0.6
 pydantic==2.9.2
 httpx==0.27.2
 python-jose[cryptography]==3.3.0
-tenacity==9.0.0
+tenacity<9.0.0
 # Local AI models (no external API keys needed)
 torch
 transformers

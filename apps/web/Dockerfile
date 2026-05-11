@@ -1,3 +1,8 @@
+# ==========================================
+# Web App (Next.js) — Production Dockerfile
+# ==========================================
+# Multi-stage build with standalone output for minimal image size.
+
 FROM node:20-alpine AS base
 
 # --- Dependencies ---
@@ -12,7 +17,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set build-time env vars
+# Set build-time env vars (injected by docker-compose or CI)
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NEXT_PUBLIC_AGENT_URL
@@ -28,6 +33,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -41,5 +49,9 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
 CMD ["node", "server.js"]

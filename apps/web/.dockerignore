@@ -1,0 +1,35 @@
+# Dependencies (re-installed during build)
+node_modules
+.pnp.*
+
+# Build outputs
+.next
+out
+build
+
+# Environment files (injected at build/runtime)
+.env
+.env.local
+.env.*.local
+
+# Dev/test artifacts
+coverage
+*.tsbuildinfo
+next-env.d.ts
+diagnose_save.js
+inspect_schema.js
+test_db.js
+test_insert.js
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docs
+README.md
