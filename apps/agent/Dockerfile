@@ -44,9 +44,8 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install Python dependencies with a high timeout and cache mount to prevent network dropouts
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --default-timeout=1000 -r requirements.txt
+# Install Python dependencies with a high timeout to prevent network dropouts
+RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # Install Playwright browser binaries with extended timeout and retry loop
 ENV PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000
