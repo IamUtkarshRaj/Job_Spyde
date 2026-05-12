@@ -8,6 +8,8 @@ import { OptimizingLoader } from './OptimizingLoader'
 import { OptimizedResumePreview } from './OptimizedResumePreview'
 import { ResumePDFViewer } from './ResumePDFViewer'
 
+const AGENT_URL = process.env.NEXT_PUBLIC_AGENT_URL || '/api/agent'
+
 interface ResumeOptimizerClientProps {
     initialProfile: any
     initialProjects: any[]
@@ -40,7 +42,7 @@ export function ResumeOptimizerClient({ initialProfile, initialProjects, resumeT
         if (!resumeText) return;
         setIsExtracting(true);
         try {
-            const res = await fetch('http://localhost:8000/v1/resume/extract-all', {
+            const res = await fetch(`${AGENT_URL}/v1/resume/extract-all`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ resume_text: resumeText })
@@ -126,7 +128,7 @@ export function ResumeOptimizerClient({ initialProfile, initialProjects, resumeT
                 company: jCompany,
             }
 
-            const res = await fetch('http://localhost:8000/v1/resume/optimize-structured', {
+            const res = await fetch(`${AGENT_URL}/v1/resume/optimize-structured`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
