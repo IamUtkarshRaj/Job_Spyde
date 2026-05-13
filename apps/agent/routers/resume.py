@@ -287,6 +287,77 @@ Instructions:
             "error": str(e),
         }
 
+def _repair_json(raw: str) -> dict:
+    """
+    Multi-step JSON repair for common LLM output issues.
+    Handles: trailing commas, single quotes, control chars, truncation.
+    """
+    import json, re
+
+    # Step 0: Strip any leading/trailing whitespace and BOM
+    text = raw.strip().lstrip('\ufeff')
+
+    # Step 1: Remove control characters (except \n, \t) that break JSON
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', text)
+
+    # Step 2: Try parsing as-is first
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 3: Remove trailing commas before } or ]
+    text = re.sub(r',\s*([\]}])', r'\1', text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 4: Replace single quotes with double quotes (careful with apostrophes)
+    # Only replace single quotes that look like JSON delimiters
+    fixed = re.sub(r"(?<![a-zA-Z])'([^']*?)'(?=\s*[:,\]\}])", r'"\1"', text)
+    fixed = re.sub(r"(?<=[\[{,:])\s*'([^']*?)'\s*(?=[,\]\}:])", r'"\1"', fixed)
+    try:
+        return json.loads(fixed)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 5: Fix truncated output — close unclosed strings, brackets, braces
+    repaired = text
+    if repaired.count('"') % 2 != 0:
+        repaired += '"'
+    
+    # Close unclosed brackets/braces
+    open_b = repaired.count('{') - repaired.count('}')
+    open_br = repaired.count('[') - repaired.count(']')
+    
+    # Remove any trailing comma before closing
+    repaired = repaired.rstrip().rstrip(',')
+    repaired += ']' * max(0, open_br)
+    repaired += '}' * max(0, open_b)
+    
+    # Also remove trailing commas again after repair
+    repaired = re.sub(r',\s*([\]}])', r'\1', repaired)
+    
+    try:
+        return json.loads(repaired)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 6: Nuclear option — find the first { and last } and try to parse that
+    first_brace = text.find('{')
+    last_brace = text.rfind('}')
+    if first_brace != -1 and last_brace > first_brace:
+        snippet = text[first_brace:last_brace + 1]
+        snippet = re.sub(r',\s*([\]}])', r'\1', snippet)
+        try:
+            return json.loads(snippet)
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+
 @router.post("/extract-all")
 async def extract_all(req: ExtractAllRequest):
     """Extract profile info and projects from raw resume text using Regex and LLM."""
@@ -309,72 +380,118 @@ async def extract_all(req: ExtractAllRequest):
         linkedin_match = re.search(r'(https?://(?:www\.)?linkedin\.com/in/[\w-]+)', text, re.IGNORECASE)
         linkedin_url = linkedin_match.group(0) if linkedin_match else ""
 
-        # 2. LLM Extraction (Gemini optimized)
+        # 2. LLM Extraction (generic prompt — works for any resume)
         llm = get_llm()
-        prompt = f"""You are a professional resume parser. Extract ALL information from the text below into a structured JSON.
+        prompt = f"""You are a resume data extraction engine. Parse the resume text below and return a JSON object.
 
-### GUIDELINES:
-1. **Projects**: Look for the 'PROJECTS' section. Extract 'Document Q&A Chatbot', 'Face Movement Detector', and 'AI-based Adaptive Testing'.
-2. **Experience**: Look for 'INTERNSHIPS' and 'EXPERIENCE'. Map them both to the 'experience' field. Extract 'Bitrix Innovation' and 'Celebal Technologies'.
-3. **Education**: Extract all degrees and schools (NIET, C.M. Science College, D.A.V. Public School).
-4. **Skills**: Extract all technical and soft skills.
-5. **Certifications**: Extract all IBM and Coursera certificates.
+RULES:
+- Extract ONLY facts present in the text. Do NOT invent anything.
+- If a field is missing, use an empty string "" or empty array [].
+- Return ONLY valid JSON. No markdown fences, no commentary, no explanation.
+- Use double quotes for all JSON keys and string values.
+- Do NOT include trailing commas.
 
-### JSON SCHEMA:
+JSON SCHEMA (follow exactly):
 {{
-  "profile": {{ "full_name": "", "location": "", "professional_summary": "" }},
-  "projects": [ {{ "project_name": "", "description": "", "technologies": "", "link": "" }} ],
-  "experience": [ {{ "company": "", "title": "", "dates": "", "description": "" }} ],
-  "skills": "...",
-  "certifications": [ {{ "name": "", "issuer": "" }} ],
-  "education": [ {{ "degree": "", "school": "", "dates": "", "details": "" }} ]
+  "profile": {{
+    "full_name": "extracted name",
+    "location": "extracted location",
+    "professional_summary": "extracted or inferred summary from resume"
+  }},
+  "experience": [
+    {{
+      "company": "company name",
+      "title": "job title",
+      "dates": "date range",
+      "description": "role description and achievements"
+    }}
+  ],
+  "education": [
+    {{
+      "degree": "degree name",
+      "school": "institution name",
+      "dates": "date range",
+      "details": "relevant details like GPA, honors"
+    }}
+  ],
+  "projects": [
+    {{
+      "project_name": "name",
+      "description": "what the project does",
+      "technologies": "tech stack used",
+      "link": "URL if available"
+    }}
+  ],
+  "skills": "comma-separated list of all skills",
+  "certifications": [
+    {{
+      "name": "certificate name",
+      "issuer": "issuing organization"
+    }}
+  ]
 }}
 
-### RESUME TEXT:
+RESUME TEXT:
 {text}
 
-Return ONLY the JSON object. No conversational filler.
-"""
+Output the JSON object now:"""
+
         result = llm.invoke(prompt)
         content = result.content
         if isinstance(content, list):
-            # Extract text from list of content parts
             content = "".join([c.get("text", "") if isinstance(c, dict) else str(c) for c in content])
         content = content.strip()
-        print("\n--- AI EXTRACTION OUTPUT ---\n", content, "\n-------------------\n")
         
-        # Clean markdown if present
+        logger.info(f"AI extraction output length: {len(content)}")
+        logger.debug(f"AI extraction raw output: {content[:500]}...")
+        
+        # Clean markdown fences if present
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
-            content = content.split("```")[1].split("```")[0].strip()
+            parts = content.split("```")
+            if len(parts) >= 3:
+                content = parts[1].strip()
+                # Remove language hint like "json\n" at start
+                if content.lower().startswith("json"):
+                    content = content[4:].strip()
 
-        try:
-            data = json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.warning(f"JSON parsing error: {e}. Attempting repair...")
-            # Repair 1: Close unclosed strings
-            if content.count('"') % 2 != 0:
-                content += '"'
-            # Repair 2: Close unclosed braces/brackets
-            open_braces = content.count('{')
-            close_braces = content.count('}')
-            open_brackets = content.count('[')
-            close_brackets = content.count(']')
-            
-            content += '}' * (open_braces - close_braces)
-            content += ']' * (open_brackets - close_brackets)
-            
+        # Use robust JSON repair
+        data = _repair_json(content)
+        
+        if data is None:
+            logger.error(f"All JSON repair attempts failed. Raw content (first 1000 chars): {content[:1000]}")
+            # Last resort: retry with a simpler, stricter prompt
+            retry_prompt = f"""Extract data from this resume as JSON. Return ONLY the JSON, nothing else.
+
+{{"profile":{{"full_name":"","location":"","professional_summary":""}},"experience":[],"education":[],"projects":[],"skills":"","certifications":[]}}
+
+Fill in the fields from this resume text:
+{text[:3000]}
+
+JSON:"""
             try:
-                data = json.loads(content)
-            except:
-                logger.error("Final JSON repair failed.")
+                retry_result = llm.invoke(retry_prompt)
+                retry_content = retry_result.content
+                if isinstance(retry_content, list):
+                    retry_content = "".join([c.get("text", "") if isinstance(c, dict) else str(c) for c in retry_content])
+                retry_content = retry_content.strip()
+                if "```" in retry_content:
+                    retry_content = retry_content.split("```json")[-1].split("```")[0].strip() if "```json" in retry_content else retry_content.split("```")[1].split("```")[0].strip()
+                data = _repair_json(retry_content)
+            except Exception as retry_err:
+                logger.error(f"Retry extraction also failed: {retry_err}")
+            
+            if data is None:
+                logger.error("All extraction attempts failed. Returning empty structure.")
                 data = {}
 
         # Normalize keys to lowercase for reliable access
         data = {k.lower(): v for k, v in data.items()}
         
         profile_data = data.get("profile", {})
+        if isinstance(profile_data, str):
+            profile_data = {}
         
         return {
             "profile": {
@@ -387,7 +504,7 @@ Return ONLY the JSON object. No conversational filler.
                 "professional_summary": profile_data.get("professional_summary", "")
             },
             "projects": data.get("projects", []),
-            "experience": data.get("experience", []) or data.get("internships", []), # Map internships to experience
+            "experience": data.get("experience", []) or data.get("internships", []),
             "skills": data.get("skills", ""),
             "certifications": data.get("certifications", []),
             "education": data.get("education", [])
